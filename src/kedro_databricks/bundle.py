@@ -21,6 +21,7 @@ from kedro_databricks.utils import (
     require_databricks_run_script,
     update_list,
 )
+from mergedeep import Strategy
 
 DEFAULT = "default"
 
@@ -332,7 +333,7 @@ def _apply_overrides(
     )
 
     workflow["tasks"] = update_list(
-        workflow.get("tasks", []), overrides.get("tasks", []), "task_key", default_task
+        workflow.get("tasks", []), overrides.get("tasks", []), "task_key", default_task, Strategy.ADDITIVE
     )
     workflow["job_clusters"] = update_list(
         workflow.get("job_clusters", []),

@@ -8,6 +8,7 @@ import subprocess
 from typing import IO, Any
 
 from kedro import __version__ as kedro_version
+from mergedeep import Strategy
 
 KEDRO_VERSION = [int(x) for x in kedro_version.split(".")]
 TASK_KEY_ORDER = [
@@ -146,6 +147,7 @@ def update_list(
     new: list[dict[str, Any]],
     lookup_key: str,
     default: dict[str, Any] = {},
+    strategy: Strategy = Strategy.REPLACE,
 ):
     """Update a list of dictionaries with another list of dictionaries.
 
@@ -173,7 +175,7 @@ def update_list(
     for key in keys:
         update = copy.deepcopy(default)
         update.update(new_obj.get(key, {}))
-        new = merge(old_obj.get(key, {}), update)
+        new = merge(old_obj.get(key, {}), update, strategy=strategy)
         old_obj[key] = new
 
     return [{lookup_key: k, **v} for k, v in old_obj.items()]
