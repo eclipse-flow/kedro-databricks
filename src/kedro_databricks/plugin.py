@@ -71,6 +71,7 @@ def init(
 @click.option("-e", "--env", default=DEFAULT_RUN_ENV, help=ENV_HELP)
 @click.option("-c", "--conf", default=DEFAULT_CONF_FOLDER, help=CONF_HELP)
 @click.option("-p", "--pipeline", default=None, help="Bundle a single pipeline")
+@click.option("-r", "--runtime-params", default=None, help="Kedro run time params")
 @click.option(
     "--overwrite",
     default=False,
@@ -85,6 +86,7 @@ def bundle(
     env: str,
     conf: str,
     pipeline: str | None,
+    runtime_params: str | None,
     overwrite: bool,
 ):
     """Convert kedro pipelines into Databricks asset bundle resources"""
@@ -94,7 +96,7 @@ def bundle(
         )
 
     MSG = "Create Asset Bundle Resources"
-    controller = BundleController(metadata, env, conf)
+    controller = BundleController(metadata, env, conf, runtime_params)
     resources = controller.generate_resources(pipeline, MSG)
     bundle_resources = controller.apply_overrides(resources, default)
     controller.save_bundled_resources(bundle_resources, overwrite)
@@ -117,6 +119,7 @@ def bundle(
 @click.option("-c", "--conf", default=DEFAULT_CONF_FOLDER, help=CONF_HELP)
 @click.option("-d", "--debug/--no-debug", default=False, help="Enable debug mode")
 @click.option("-p", "--pipeline", default=None, help="Bundle a single pipeline")
+@click.option("-r", "--runtime-params", default=None, help="Kedro run time params")
 @click.option(
     "-v",
     "--var",
@@ -133,6 +136,7 @@ def deploy(
     conf: str,
     pipeline: str,
     debug: bool,
+    runtime_params: str | None,
     var: list[str],
 ):
     """Deploy the asset bundle to Databricks"""
@@ -144,7 +148,7 @@ def deploy(
     controller.validate_databricks_config()
     controller.build_project()
     if bundle is True:
-        bundle_controller = BundleController(metadata, env, conf)
+        bundle_controller = BundleController(metadata, env, conf, runtime_params)
         workflows = bundle_controller.generate_resources(pipeline)
         bundle_resources = bundle_controller.apply_overrides(workflows, "default")
         bundle_controller.save_bundled_resources(bundle_resources, overwrite=True)
