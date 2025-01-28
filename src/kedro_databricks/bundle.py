@@ -27,7 +27,7 @@ DEFAULT = "default"
 
 class BundleController:
     def __init__(
-        self, metadata: ProjectMetadata, env: str, config_dir: str = None
+        self, metadata: ProjectMetadata, env: str, config_dir: str = None, runtime_params: str | None = None
     ) -> None:
         """Create a new instance of the BundleController.
 
@@ -48,6 +48,10 @@ class BundleController:
         self.remote_conf_dir = f"/dbfs/FileStore/{self.package_name}/{config_dir}"
         self.local_conf_dir = self.metadata.project_path / config_dir / env
         self.conf = self._load_env_config(MSG="Loading configuration")
+        if runtime_params is not None:
+            self.runtime_params = runtime_params.split(" ")
+        else:
+            self.runtime_params = None
 
     def _workflows_to_resources(
         self, workflows: dict[str, dict[str, Any]], MSG: str = ""
@@ -231,6 +235,9 @@ class BundleController:
         if require_databricks_run_script():  # pragma: no cover
             entry_point = "databricks_run"
             params = params + ["--package-name", self.package_name]
+
+        if self.runtime_params and len(self.runtime_params) > 0:
+            params = params + ["--params"] + self.runtime_params
 
         depends_on = sorted(list(depends_on), key=lambda dep: dep.name)
         task = {
