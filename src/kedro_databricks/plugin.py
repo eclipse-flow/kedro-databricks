@@ -116,6 +116,12 @@ def bundle(
     default=False,
     help="Bundle the project before deploying",
 )
+@click.option(
+    "-dp",
+    "--deploy/--no-deploy",
+    default=False,
+    help="Deploy the bundle",
+)
 @click.option("-c", "--conf", default=DEFAULT_CONF_FOLDER, help=CONF_HELP)
 @click.option("-d", "--debug/--no-debug", default=False, help="Enable debug mode")
 @click.option("-p", "--pipeline", default=None, help="Bundle a single pipeline")
@@ -133,6 +139,7 @@ def deploy(
     env: str,
     target: str | None,
     bundle: bool,
+    deploy: bool,
     conf: str,
     pipeline: str,
     debug: bool,
@@ -157,4 +164,5 @@ def deploy(
     controller.upload_project_data()
     if target is None:
         target = env
-    controller.deploy_project(target=target, debug=debug, var=var)
+    if deploy:
+        controller.deploy_project(target=target, debug=debug, var=var)
