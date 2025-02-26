@@ -240,7 +240,9 @@ class BundleController:
 
         if self.runtime_params:
             # We need to get something like `["--params", "key1=value1,key2=value2"]`
-            params = params + ["--params"] + [",".join(["=" .join(pair) for pair in _batched(self.runtime_params, 2)])]
+            sorted_pairs = sorted(_batched(self.runtime_params, 2), key=lambda pair: pair[0])
+
+            params = params + ["--params"] + [",".join(["=" .join(pair) for pair in sorted_pairs])]
 
         depends_on = sorted(list(depends_on), key=lambda dep: dep.name)
         task = {
@@ -349,9 +351,9 @@ def _apply_overrides(
         overrides.get("job_clusters", []),
         "job_cluster_key",
     )
-    workflow["parameters"] = update_list(
+    workflow["parameters"] = sorted(update_list(
         workflow.get("parameters", []), overrides.get("parameters", []), "name"
-    )
+    ), key=lambda param_key: param_key["name"])
     workflow["environments"] = update_list(
         workflow.get("environments", []),
         overrides.get("environments", []),
