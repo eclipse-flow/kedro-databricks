@@ -113,12 +113,6 @@ def bundle(
     default=False,
     help="Bundle the project before deploying",
 )
-@click.option(
-    "-dp",
-    "--deploy/--no-deploy",
-    default=False,
-    help="Deploy the bundle",
-)
 @click.option("-c", "--conf", default=DEFAULT_CONF_FOLDER, help=CONF_HELP)
 @click.option("-p", "--pipeline", default=None, help="Bundle a single pipeline")
 @click.option("-r", "--runtime-params", default=None, help="Kedro run time params")
@@ -128,7 +122,6 @@ def deploy(
     metadata: ProjectMetadata,
     env: str,
     bundle: bool,
-    deploy: bool,
     conf: str,
     pipeline: str,
     runtime_params: str | None,
@@ -151,5 +144,4 @@ def deploy(
             workflows, DEFAULT_CONFIG_KEY
         )
         bundle_controller.save_bundled_resources(bundle_resources, overwrite=True)
-    if deploy:
-        controller.deploy_project(list(databricks_args))
+    controller.deploy_project(list(databricks_args))
