@@ -49,11 +49,12 @@ class BundleController:
         self.remote_conf_dir = f"/dbfs/FileStore/{self.package_name}/{config_dir}"
         self.local_conf_dir = self.metadata.project_path / config_dir / env
         self.conf = self._load_env_config(MSG="Loading configuration")
-        if runtime_params is not None:
-            self.runtime_params = runtime_params.split(" ")
-            assert len(self.runtime_params) % 2 == 0, f"There should be an even number of runtime_params, got {self.runtime_params}"
-        else:
-            self.runtime_params = None
+        self.runtime_params = runtime_params
+        # if runtime_params is not None:
+        #     # self.runtime_params = runtime_params.split(" ")
+        #     # assert len(self.runtime_params) % 2 == 0, f"There should be an even number of runtime_params, got {self.runtime_params}"
+        # else:
+        #     self.runtime_params = None
 
     def _workflows_to_resources(
         self, workflows: dict[str, dict[str, Any]], MSG: str = ""
@@ -240,9 +241,9 @@ class BundleController:
 
         if self.runtime_params:
             # We need to get something like `["--params", "key1=value1,key2=value2"]`
-            sorted_pairs = sorted(_batched(self.runtime_params, 2), key=lambda pair: pair[0])
+            # sorted_pairs = sorted(_batched(self.runtime_params, 2), key=lambda pair: pair[0])
 
-            params = params + ["--params"] + [",".join(["=" .join(pair) for pair in sorted_pairs])]
+            params = params + ["--params", self.runtime_params] #+ [",".join(["=" .join(pair) for pair in sorted_pairs])]
 
         depends_on = sorted(list(depends_on), key=lambda dep: dep.name)
         task = {
